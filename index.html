@@ -47,7 +47,7 @@
     <header>✨ BHARAT AI</header>
 
     <div id="chat-box">
-        <div class="message ai-msg">Namaste Director Sahab! Main Bharat AI hoon, ek Super Intelligence model. Aap mujhse koi bhi sawal pooch sakte hain ya "photo banao" bol kar high-quality image generate karwa sakte hain.</div>
+        <div class="message ai-msg">Namaste Director Sahab! Main Bharat AI hoon. Koi bhi sawal puchiye ya photo banane ko kahiye.</div>
     </div>
 
     <div class="input-area">
@@ -57,7 +57,6 @@
     </div>
 
     <script>
-        // Aapki Nayi Verified API Key aur Flash Model
         const API_KEY = 'AQ.Ab8RN6K_ZsPpsHmObKS4gTjUlSvhrxG905PPLGTwdHwXbPdPA'; 
 
         const chatBox = document.getElementById('chat-box');
@@ -92,23 +91,21 @@
             userInput.value = '';
             isWaiting = true;
 
-            // 1. IMAGE GENERATION LOGIC
             const lowerText = text.toLowerCase();
             if (lowerText.includes("photo") || lowerText.includes("image") || lowerText.includes("tasveer") || lowerText.includes("pic")) {
-                const loadingMsg = appendMessage("Bharat AI aapki photo bana raha hai, kripya wait karein... 🎨", 'ai');
+                const loadingMsg = appendMessage("Bharat AI aapki photo bana raha hai... 🎨", 'ai');
                 loadingMsg.classList.add('loading');
                 
                 setTimeout(() => {
                     const safePrompt = encodeURIComponent(text);
                     const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=1024&height=1024&nologo=true`;
                     chatBox.removeChild(loadingMsg);
-                    appendMessage(`<img src="${imageUrl}" style="width: 100%; border-radius: 8px; margin-top: 5px;" alt="AI Generated Image"><br>Yeh lijiye aapki photo! Ise save karne ke liye photo par long-press karein.`, 'ai', true);
+                    appendMessage(`<img src="${imageUrl}" style="width: 100%; border-radius: 8px; margin-top: 5px;" alt="AI Generated Image"><br>Yeh lijiye aapki photo!`, 'ai', true);
                     isWaiting = false;
                 }, 2000);
                 return;
             }
 
-            // 2. TEXT GENERATION LOGIC (GEMINI FLASH - FAST & UNLIMITED)
             const loadingMsg = appendMessage("Bharat AI soch raha hai...", 'ai');
             loadingMsg.classList.add('loading');
 
@@ -127,11 +124,13 @@
                 if(data.candidates && data.candidates[0].content.parts[0].text) {
                     appendMessage(data.candidates[0].content.parts[0].text, 'ai', true);
                 } else {
-                    appendMessage("Response generate karne me kuch dikkat aayi, dobara try karein.", 'ai');
+                    // Yahan exact error print hoga jo Google bhej raha hai
+                    const errorMsg = data.error ? data.error.message : JSON.stringify(data);
+                    appendMessage("Google Error: " + errorMsg, 'ai');
                 }
             } catch (error) {
                 chatBox.removeChild(loadingMsg);
-                appendMessage("API connection fail ho gaya. Internet check karein.", 'ai');
+                appendMessage("Network Error: " + error.message, 'ai');
             }
             isWaiting = false;
         }
@@ -143,31 +142,13 @@
         function startVoiceRecognition() {
             const micBtn = document.getElementById('micBtn');
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
-            if (!SpeechRecognition) {
-                alert("Aapka browser voice support nahi karta. Kripya Google Chrome use karein.");
-                return;
-            }
-
+            if (!SpeechRecognition) { alert("Voice not supported."); return; }
             const recognition = new SpeechRecognition();
             recognition.lang = 'hi-IN';
-            recognition.interimResults = false;
-
-            recognition.onstart = function() {
-                micBtn.style.backgroundColor = '#FF9933';
-                micBtn.style.color = 'white';
-            };
-
             recognition.onresult = function(event) {
                 userInput.value = event.results[0][0].transcript;
                 sendMessage(); 
             };
-
-            recognition.onend = function() {
-                micBtn.style.backgroundColor = '#2a2b2e';
-                micBtn.style.color = '#FF9933';
-            };
-
             recognition.start();
         }
     </script>
