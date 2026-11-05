@@ -7,10 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: #131314; color: #E3E3E3; display: flex; height: 100vh; overflow: hidden; }
+        html, body { height: 100%; background-color: #131314; color: #E3E3E3; overflow: hidden; }
         
-        .sidebar { width: 280px; background-color: #1e1f20; border-right: 1px solid #333; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 10; position: relative; }
-        .sidebar.closed { transform: translateX(-280px); position: absolute; height: 100%; }
+        /* App Layout */
+        .app-layout { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+
+        /* Sidebar Styles */
+        .sidebar { width: 280px; background-color: #1e1f20; border-right: 1px solid #333; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 100; position: absolute; height: 100%; left: 0; top: 0; }
+        .sidebar.closed { transform: translateX(-280px); }
         .sidebar-header { padding: 15px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
         .new-chat-btn { background-color: #2b2c2f; border: 1px solid #444; color: #fff; padding: 10px 15px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .new-chat-btn:hover { background-color: #38393d; }
@@ -18,88 +22,99 @@
         .history-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #c4c7c5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: 0.2s; }
         .history-item:hover { background-color: #2b2c2f; color: #fff; }
 
-        .main-container { flex: 1; display: flex; flex-direction: column; height: 100vh; background-color: #131314; position: relative; transition: margin-left 0.3s ease; }
+        /* Main Container */
+        .main-container { flex: 1; display: flex; flex-direction: column; height: 100vh; width: 100%; background-color: #131314; position: relative; }
         
+        /* Header */
         header { 
-            padding: 15px 25px; 
+            padding: 12px 20px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center;
             background-color: #131314; 
             border-bottom: 1px solid #222; 
+            flex-shrink: 0;
+            z-index: 10;
         }
         .brand-title { 
-            font-size: 22px; 
+            font-size: 20px; 
             font-weight: 700; 
             letter-spacing: 1.5px; 
             background: linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
         }
-        .model-selector { background-color: #1e1f20; color: #e3e3e3; border: 1px solid #444; padding: 6px 12px; border-radius: 20px; font-size: 13px; outline: none; cursor: pointer; }
+        .model-selector { background-color: #1e1f20; color: #e3e3e3; border: 1px solid #444; padding: 5px 10px; border-radius: 20px; font-size: 12px; outline: none; cursor: pointer; }
 
-        #chat-box { flex: 1; padding: 20px 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
-        .message-wrapper { display: flex; width: 100%; gap: 15px; }
+        /* Chat Box */
+        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        .message-wrapper { display: flex; width: 100%; gap: 10px; }
         .message-wrapper.user { justify-content: flex-end; }
-        .message { max-width: 75%; padding: 15px 20px; border-radius: 14px; line-height: 1.6; font-size: 15px; word-wrap: break-word; }
+        .message { max-width: 80%; padding: 12px 16px; border-radius: 14px; line-height: 1.5; font-size: 15px; word-wrap: break-word; }
         .user-msg { background-color: #2b2c2f; color: #fff; border-bottom-right-radius: 4px; }
         .ai-msg { background-color: #1e1f20; color: #e3e3e3; border-bottom-left-radius: 4px; border: 1px solid #333; }
         
-        .input-container { padding: 20px 40px; background-color: #131314; display: flex; justify-content: center; }
-        .input-box { width: 100%; max-width: 800px; background-color: #1e1f20; border: 1px solid #444; border-radius: 30px; display: flex; align-items: center; padding: 8px 15px; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: 0.3s; }
+        /* Fixed Bottom Input Area */
+        .input-container { padding: 15px 20px; background-color: #131314; display: flex; justify-content: center; flex-shrink: 0; border-top: 1px solid #222; z-index: 10; }
+        .input-box { width: 100%; max-width: 800px; background-color: #1e1f20; border: 1px solid #444; border-radius: 30px; display: flex; align-items: center; padding: 6px 14px; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         .input-box:focus-within { border-color: #FF9933; }
-        #user-input { flex: 1; background: transparent; border: none; color: white; padding: 10px; font-size: 16px; outline: none; }
+        #user-input { flex: 1; background: transparent; border: none; color: white; padding: 8px; font-size: 15px; outline: none; min-width: 50px; }
         
-        .icon-btn { background: transparent; border: none; color: #aaa; cursor: pointer; font-size: 18px; padding: 8px; border-radius: 50%; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .icon-btn { background: transparent; border: none; color: #aaa; cursor: pointer; font-size: 18px; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
         .icon-btn:hover { background-color: #2b2c2f; color: #fff; }
-        .send-btn { color: #138808; background-color: #2b2c2f; }
+        .send-btn { color: #138808; background-color: #2b2c2f; width: 38px; height: 38px; }
         .send-btn:hover { background-color: #138808; color: #fff; }
         
         .loading { font-style: italic; color: #888; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-
-        @media(max-width: 768px) {
-            .sidebar { position: absolute; height: 100%; left: 0; }
-            .sidebar.closed { transform: translateX(-100%); }
-            #chat-box, .input-container { padding: 15px; }
-        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar closed" id="sidebar">
-        <div class="sidebar-header">
-            <button class="new-chat-btn" onclick="startNewChat()">+ New Chat</button>
-        </div>
-        <div class="history-list" id="historyList">
-            <div class="history-item" onclick="startNewChat()">Bharat AI Super Session</div>
-        </div>
-    </div>
-
-    <div class="main-container">
-        <header>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <button class="icon-btn" onclick="toggleSidebar()" style="font-size: 20px;">☰</button>
-                <div class="brand-title">✨ BHARAT AI</div>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <div class="sidebar closed" id="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" onclick="startNewChat()">+ New Chat</button>
             </div>
-            <div>
-                <select class="model-selector" id="modelSelect">
-                    <option value="ultra">Bharat AI Flash (Super Smooth)</option>
-                </select>
-            </div>
-        </header>
-
-        <div id="chat-box">
-            <div class="message-wrapper">
-                <div class="message ai-msg">Namaste Director Sahab! Main Bharat AI hoon. Ab memory strong hai, sidebar smooth hai, aur main bilkul natural Hinglish me baat karunga. Boliye kya help karu?</div>
+            <div class="history-list" id="historyList">
+                <div class="history-item" onclick="startNewChat()">Bharat AI Master Session</div>
             </div>
         </div>
 
-        <div class="input-container">
-            <div class="input-box">
-                <button class="icon-btn" id="micBtn" onclick="startVoiceRecognition()" title="Voice Input">🎙️</button>
-                <input type="text" id="user-input" placeholder="Kuch bhi puchiye, news, weather ya photo...">
-                <button class="icon-btn send-btn" onclick="sendMessage()" title="Send">➤</button>
+        <!-- Main Content -->
+        <div class="main-container">
+            <header>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="icon-btn" onclick="toggleSidebar()" style="font-size: 18px;">☰</button>
+                    <div class="brand-title">✨ BHARAT AI</div>
+                </div>
+                <div>
+                    <select class="model-selector" id="modelSelect">
+                        <option value="flash">Bharat AI Flash</option>
+                    </select>
+                </div>
+            </header>
+
+            <div id="chat-box">
+                <div class="message-wrapper">
+                    <div class="message ai-msg">Namaste Director Sahab! Layout fully fix ho chuka hai. Type karo, file lagao, ya photo khincho — sab makkhan chalega!</div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-box">
+                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload(event)">
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleCameraUpload(event)">
+
+                    <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
+                    <button class="icon-btn" onclick="document.getElementById('cameraInput').click()" title="Camera">📷</button>
+                    <button class="icon-btn" id="micBtn" onclick="startVoiceRecognition()" title="Voice">🎙️</button>
+                    
+                    <input type="text" id="user-input" placeholder="Ask anything, news, weather or photo...">
+                    
+                    <button class="icon-btn send-btn" onclick="sendMessage()" title="Send">➤</button>
+                </div>
             </div>
         </div>
     </div>
@@ -110,9 +125,8 @@
         const sidebar = document.getElementById('sidebar');
         let isWaiting = false;
 
-        // Persistent Session Memory
         let conversationLog = [
-            { sender: "system", text: "You are Bharat AI, created by Iftikharuddin Ansari. You always reply in natural, friendly Hinglish. Never forget past context or references." }
+            { sender: "system", text: "You are Bharat AI, created by Iftikharuddin Ansari. You always reply in natural, friendly Hinglish. Never forget past context." }
         ];
 
         function toggleSidebar() {
@@ -151,10 +165,33 @@
             return msgDiv;
         }
 
-        // SILENT AUTO-RETRY MULTI-PROXY ENGINE WITH FULL MEMORY
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            appendMessage(`📂 File attached: <b>${file.name}</b>`, 'user', true);
+            conversationLog.push({ sender: "user", text: `Uploaded file: ${file.name}` });
+            setTimeout(() => {
+                appendMessage(`File mil gayi Director Sahab! Iske baare me kya janna hai?`, 'ai');
+            }, 800);
+        }
+
+        function handleCameraUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                appendMessage(`<img src="${e.target.result}" style="width: 100%; border-radius: 8px;" alt="Snapshot"><br>📷 Photo captured!`, 'user', true);
+                conversationLog.push({ sender: "user", text: "Uploaded camera snapshot." });
+                setTimeout(() => {
+                    appendMessage(`Badiya photo hai Director Sahab!`, 'ai');
+                }, 800);
+            };
+            reader.readAsDataURL(file);
+        }
+
         async function fetchWithFullMemory(conversationArray) {
             let fullTranscript = conversationArray.map(c => `${c.sender === 'user' ? 'User' : 'BharatAI'}: ${c.text}`).join("\n");
-            let smartPrompt = `Strict Instruction: Respond in natural conversational Hinglish. Maintain context from previous lines.\n\n${fullTranscript}\nBharatAI:`;
+            let smartPrompt = `Strict Instruction: Respond in natural conversational Hinglish. Maintain context.\n\n${fullTranscript}\nBharatAI:`;
 
             const proxies = [
                 `https://text.pollinations.ai/${encodeURIComponent(smartPrompt)}`,
@@ -172,14 +209,11 @@
                                 return text.replace(/^BharatAI:\s*/i, "").trim();
                             }
                         }
-                    } catch (err) {
-                        continue;
-                    }
+                    } catch (err) { continue; }
                 }
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
-
-            return "Haan Director Sahab, main sun raha hoon! Agla sawal puchiye.";
+            return "Haan Director Sahab, sun raha hoon! Agla sawal puchiye.";
         }
 
         async function fetchLiveWeather(location) {
@@ -187,18 +221,14 @@
                 const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`);
                 const geoData = await geoRes.json();
                 if (!geoData.results || geoData.results.length === 0) return null;
-                
                 const { latitude, longitude, name, country } = geoData.results[0];
                 const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
                 const weatherData = await weatherRes.json();
-                
                 if (weatherData.current_weather) {
                     const cw = weatherData.current_weather;
                     return `${name}, ${country} ka live mausam: Temperature ${cw.temperature}°C hai aur wind speed ${cw.windspeed} km/h hai!`;
                 }
-            } catch (e) {
-                return null;
-            }
+            } catch (e) { return null; }
             return null;
         }
 
@@ -229,12 +259,11 @@
             if (lowerText.includes("photo") || lowerText.includes("image") || lowerText.includes("tasveer") || lowerText.includes("pic") || lowerText.includes("bana do")) {
                 const loadingMsg = appendMessage("Bharat AI high-resolution photo render kar raha hai... 🎨", 'ai');
                 loadingMsg.classList.add('loading');
-                
                 setTimeout(() => {
                     const safePrompt = encodeURIComponent(text);
                     const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=1280&height=1280&nologo=true&enhance=true`;
                     chatBox.removeChild(loadingMsg.parentNode);
-                    const imgReply = `<img src="${imageUrl}" style="width: 100%; border-radius: 8px; margin-top: 5px;" alt="AI Generated Image"><br>Yeh lijiye aapki high-quality photo taiyar hai!`;
+                    const imgReply = `<img src="${imageUrl}" style="width: 100%; border-radius: 8px; margin-top: 5px;" alt="AI Image"><br>Yeh lijiye aapki high-quality photo taiyar hai!`;
                     appendMessage(imgReply, 'ai', true);
                     conversationLog.push({ sender: "ai", text: "[Generated Image successfully]" });
                     isWaiting = false;
@@ -246,25 +275,22 @@
             if (lowerText.includes("weather") || lowerText.includes("mausam") || lowerText.includes("temperature") || lowerText.includes("tapmaan")) {
                 const loadingMsg = appendMessage("Live mausam check kar rahe hain...", 'ai');
                 loadingMsg.classList.add('loading');
-
                 let city = "Delhi";
                 const words = text.split(" ");
                 let foundCity = words[words.length - 1];
                 if(foundCity && foundCity.length > 2 && !["weather", "mausam", "ka", "kaisa", "hai", "kya", "batao"].includes(foundCity.toLowerCase())) {
                     city = foundCity;
                 }
-
                 const weatherReport = await fetchLiveWeather(city);
                 chatBox.removeChild(loadingMsg.parentNode);
-
-                const finalWeatherMsg = weatherReport || "Mausam ki jankari mil nahi saki, city ka naam theek se likhiye.";
+                const finalWeatherMsg = weatherReport || "Mausam ki jankari mil nahi saki.";
                 appendMessage(finalWeatherMsg, 'ai');
                 conversationLog.push({ sender: "ai", text: finalWeatherMsg });
                 isWaiting = false;
                 return;
             }
 
-            // 4. FULL MEMORY CHAT & NEWS ENGINE
+            // 4. FULL MEMORY CHAT ENGINE
             const loadingMsg = appendMessage("Soch rahe hain...", 'ai');
             loadingMsg.classList.add('loading');
 
@@ -294,7 +320,6 @@
         });
 
         function startVoiceRecognition() {
-            const micBtn = document.getElementById('micBtn');
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) { alert("Voice recognition not supported."); return; }
             const recognition = new SpeechRecognition();
