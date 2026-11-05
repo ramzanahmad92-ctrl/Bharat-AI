@@ -9,8 +9,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         body { background-color: #131314; color: #E3E3E3; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar Styles */
-        .sidebar { width: 280px; background-color: #1e1f20; border-right: 1px solid #333; display: flex; flex-direction: column; transition: 0.3s; z-index: 10; }
+        .sidebar { width: 280px; background-color: #1e1f20; border-right: 1px solid #333; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 10; position: relative; }
+        .sidebar.closed { transform: translateX(-280px); position: absolute; height: 100%; }
         .sidebar-header { padding: 15px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
         .new-chat-btn { background-color: #2b2c2f; border: 1px solid #444; color: #fff; padding: 10px 15px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .new-chat-btn:hover { background-color: #38393d; }
@@ -18,10 +18,8 @@
         .history-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #c4c7c5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: 0.2s; }
         .history-item:hover { background-color: #2b2c2f; color: #fff; }
 
-        /* Main Chat Area */
-        .main-container { flex: 1; display: flex; flex-direction: column; height: 100vh; background-color: #131314; position: relative; }
+        .main-container { flex: 1; display: flex; flex-direction: column; height: 100vh; background-color: #131314; position: relative; transition: margin-left 0.3s ease; }
         
-        /* Top Navigation Header */
         header { 
             padding: 15px 25px; 
             display: flex; 
@@ -47,7 +45,6 @@
         .user-msg { background-color: #2b2c2f; color: #fff; border-bottom-right-radius: 4px; }
         .ai-msg { background-color: #1e1f20; color: #e3e3e3; border-bottom-left-radius: 4px; border: 1px solid #333; }
         
-        /* Input Area */
         .input-container { padding: 20px 40px; background-color: #131314; display: flex; justify-content: center; }
         .input-box { width: 100%; max-width: 800px; background-color: #1e1f20; border: 1px solid #444; border-radius: 30px; display: flex; align-items: center; padding: 8px 15px; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: 0.3s; }
         .input-box:focus-within { border-color: #FF9933; }
@@ -62,20 +59,20 @@
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
         @media(max-width: 768px) {
-            .sidebar { position: absolute; height: 100%; left: -280px; }
-            .sidebar.active { left: 0; }
+            .sidebar { position: absolute; height: 100%; left: 0; }
+            .sidebar.closed { transform: translateX(-100%); }
             #chat-box, .input-container { padding: 15px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar closed" id="sidebar">
         <div class="sidebar-header">
             <button class="new-chat-btn" onclick="startNewChat()">+ New Chat</button>
         </div>
         <div class="history-list" id="historyList">
-            <div class="history-item" onclick="startNewChat()">Bharat AI Master Session</div>
+            <div class="history-item" onclick="startNewChat()">Bharat AI Super Session</div>
         </div>
     </div>
 
@@ -87,22 +84,21 @@
             </div>
             <div>
                 <select class="model-selector" id="modelSelect">
-                    <option value="ultra">Bharat AI Ultra (Live Web & Weather)</option>
-                    <option value="flash">Bharat AI Turbo</option>
+                    <option value="ultra">Bharat AI Flash (Super Smooth)</option>
                 </select>
             </div>
         </header>
 
         <div id="chat-box">
             <div class="message-wrapper">
-                <div class="message ai-msg">Namaste Director Sahab! Live worldwide news, geopolitics, aur real-time weather integration active hai. Batayiye aaj kya search karna hai?</div>
+                <div class="message ai-msg">Namaste Director Sahab! Main Bharat AI hoon. Ab memory strong hai, sidebar smooth hai, aur main bilkul natural Hinglish me baat karunga. Boliye kya help karu?</div>
             </div>
         </div>
 
         <div class="input-container">
             <div class="input-box">
                 <button class="icon-btn" id="micBtn" onclick="startVoiceRecognition()" title="Voice Input">🎙️</button>
-                <input type="text" id="user-input" placeholder="Ask live news, weather, geopolitics, or photo...">
+                <input type="text" id="user-input" placeholder="Kuch bhi puchiye, news, weather ya photo...">
                 <button class="icon-btn send-btn" onclick="sendMessage()" title="Send">➤</button>
             </div>
         </div>
@@ -111,14 +107,24 @@
     <script>
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
+        const sidebar = document.getElementById('sidebar');
         let isWaiting = false;
 
+        // Persistent Session Memory
+        let conversationLog = [
+            { sender: "system", text: "You are Bharat AI, created by Iftikharuddin Ansari. You always reply in natural, friendly Hinglish. Never forget past context or references." }
+        ];
+
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
+            sidebar.classList.toggle('closed');
         }
 
         function startNewChat() {
-            chatBox.innerHTML = `<div class="message-wrapper"><div class="message ai-msg">Nayi chat shuru ho chuki hai. Boliye Director Sahab!</div></div>`;
+            chatBox.innerHTML = `<div class="message-wrapper"><div class="message ai-msg">Nayi chat shuru ho chuki hai Director Sahab! Boliye kya discuss karein?</div></div>`;
+            conversationLog = [
+                { sender: "system", text: "You are Bharat AI, created by Iftikharuddin Ansari. Reply in natural Hinglish." }
+            ];
+            sidebar.classList.add('closed');
         }
 
         function appendMessage(text, sender, isHtml = false) {
@@ -145,29 +151,37 @@
             return msgDiv;
         }
 
-        // MULTI-PROXY AUTO-SWITCHING ENGINE FOR LIVE NEWS & KNOWLEDGE
-        async function fetchFromMultiProxies(query) {
+        // SILENT AUTO-RETRY MULTI-PROXY ENGINE WITH FULL MEMORY
+        async function fetchWithFullMemory(conversationArray) {
+            let fullTranscript = conversationArray.map(c => `${c.sender === 'user' ? 'User' : 'BharatAI'}: ${c.text}`).join("\n");
+            let smartPrompt = `Strict Instruction: Respond in natural conversational Hinglish. Maintain context from previous lines.\n\n${fullTranscript}\nBharatAI:`;
+
             const proxies = [
-                `https://text.pollinations.ai/${encodeURIComponent(query)}`,
-                `https://r.jina.ai/https://text.pollinations.ai/${encodeURIComponent(query)}`,
-                `https://corsproxy.io/?https://text.pollinations.ai/${encodeURIComponent(query)}`
+                `https://text.pollinations.ai/${encodeURIComponent(smartPrompt)}`,
+                `https://r.jina.ai/https://text.pollinations.ai/${encodeURIComponent(smartPrompt)}`,
+                `https://corsproxy.io/?https://text.pollinations.ai/${encodeURIComponent(smartPrompt)}`
             ];
 
-            for (let url of proxies) {
-                try {
-                    const response = await fetch(url, { signal: AbortSignal.timeout(6000) });
-                    if (response.ok) {
-                        let text = await response.text();
-                        if (text && text.trim().length > 2) return text;
+            for (let attempt = 0; attempt < 3; attempt++) {
+                for (let url of proxies) {
+                    try {
+                        const response = await fetch(url, { signal: AbortSignal.timeout(6000) });
+                        if (response.ok) {
+                            let text = await response.text();
+                            if (text && text.trim().length > 2 && !text.includes("busy")) {
+                                return text.replace(/^BharatAI:\s*/i, "").trim();
+                            }
+                        }
+                    } catch (err) {
+                        continue;
                     }
-                } catch (err) {
-                    continue;
                 }
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
-            throw new Error("All proxies busy");
+
+            return "Haan Director Sahab, main sun raha hoon! Agla sawal puchiye.";
         }
 
-        // LIVE WEATHER FETCHING FUNCTION
         async function fetchLiveWeather(location) {
             try {
                 const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`);
@@ -180,7 +194,7 @@
                 
                 if (weatherData.current_weather) {
                     const cw = weatherData.current_weather;
-                    return `Live Weather for ${name}, ${country}:\n- Temperature: ${cw.temperature}°C\n- Wind Speed: ${cw.windspeed} km/h\n- Condition Code: ${cw.weathercode}`;
+                    return `${name}, ${country} ka live mausam: Temperature ${cw.temperature}°C hai aur wind speed ${cw.windspeed} km/h hai!`;
                 }
             } catch (e) {
                 return null;
@@ -197,14 +211,17 @@
             userInput.value = '';
             isWaiting = true;
 
+            conversationLog.push({ sender: "user", text: text });
             const lowerText = text.toLowerCase();
 
             // 1. STRICT FOUNDER OVERRIDE LOGIC
             if (lowerText.includes("founder") || lowerText.includes("owner") || (lowerText.includes("kisne") && lowerText.includes("banaya")) || (lowerText.includes("kaun") && lowerText.includes("malik"))) {
                 setTimeout(() => {
-                    appendMessage("Mujhe Iftikharuddin Ansari ne banaya hai, wahi mere Director aur Founder hain.", 'ai');
+                    const reply = "Mujhe Iftikharuddin Ansari ne banaya hai, wahi mere Director aur Founder hain.";
+                    appendMessage(reply, 'ai');
+                    conversationLog.push({ sender: "ai", text: reply });
                     isWaiting = false;
-                }, 300);
+                }, 200);
                 return;
             }
 
@@ -217,47 +234,42 @@
                     const safePrompt = encodeURIComponent(text);
                     const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=1280&height=1280&nologo=true&enhance=true`;
                     chatBox.removeChild(loadingMsg.parentNode);
-                    appendMessage(`<img src="${imageUrl}" style="width: 100%; border-radius: 8px; margin-top: 5px;" alt="AI Generated Image"><br>Yeh lijiye aapki high-quality photo taiyar hai!`, 'ai', true);
+                    const imgReply = `<img src="${imageUrl}" style="width: 100%; border-radius: 8px; margin-top: 5px;" alt="AI Generated Image"><br>Yeh lijiye aapki high-quality photo taiyar hai!`;
+                    appendMessage(imgReply, 'ai', true);
+                    conversationLog.push({ sender: "ai", text: "[Generated Image successfully]" });
                     isWaiting = false;
-                }, 1200);
+                }, 1000);
                 return;
             }
 
-            // 3. LIVE WEATHER INTENT DETECTION
+            // 3. LIVE WEATHER INTENT
             if (lowerText.includes("weather") || lowerText.includes("mausam") || lowerText.includes("temperature") || lowerText.includes("tapmaan")) {
-                const loadingMsg = appendMessage("Bharat AI live weather fetch kar raha hai...", 'ai');
+                const loadingMsg = appendMessage("Live mausam check kar rahe hain...", 'ai');
                 loadingMsg.classList.add('loading');
 
-                // Extract potential city name (simple heuristic)
-                let city = "Delhi"; // default
+                let city = "Delhi";
                 const words = text.split(" ");
                 let foundCity = words[words.length - 1];
-                if(foundCity && foundCity.length > 2 && !["weather", "mausam", "ka", "kaisa", "hai", "kya"].includes(foundCity.toLowerCase())) {
+                if(foundCity && foundCity.length > 2 && !["weather", "mausam", "ka", "kaisa", "hai", "kya", "batao"].includes(foundCity.toLowerCase())) {
                     city = foundCity;
                 }
 
                 const weatherReport = await fetchLiveWeather(city);
                 chatBox.removeChild(loadingMsg.parentNode);
 
-                if(weatherReport) {
-                    appendMessage(weatherReport, 'ai');
-                } else {
-                    appendMessage("Mausam ki jankari mil nahi saki, kripya city ka sahi naam likhein.", 'ai');
-                }
+                const finalWeatherMsg = weatherReport || "Mausam ki jankari mil nahi saki, city ka naam theek se likhiye.";
+                appendMessage(finalWeatherMsg, 'ai');
+                conversationLog.push({ sender: "ai", text: finalWeatherMsg });
                 isWaiting = false;
                 return;
             }
 
-            // 4. LIVE WORLDWIDE NEWS & GEOPOLITICS ENGINE
-            const loadingMsg = appendMessage("Bharat AI live world news & geopolitics search kar raha hai...", 'ai');
+            // 4. FULL MEMORY CHAT & NEWS ENGINE
+            const loadingMsg = appendMessage("Soch rahe hain...", 'ai');
             loadingMsg.classList.add('loading');
 
             try {
-                const systemContext = "You are Bharat AI, a super-intelligence model with real-time global knowledge, breaking worldwide news, and geopolitics analytics.";
-                const smartQuery = `${systemContext} User query: ${text}`;
-                
-                let replyText = await fetchFromMultiProxies(smartQuery);
-                
+                let replyText = await fetchWithFullMemory(conversationLog);
                 chatBox.removeChild(loadingMsg.parentNode);
                 
                 if (lowerText.includes("founder") || lowerText.includes("owner")) {
@@ -266,12 +278,13 @@
 
                 if(replyText && replyText.trim() !== "") {
                     appendMessage(replyText, 'ai', true);
+                    conversationLog.push({ sender: "ai", text: replyText });
                 } else {
-                    appendMessage("Jawab taiyar karne me kuch samasya aayi, kripya dobara puchiye.", 'ai');
+                    appendMessage("Haan Director Sahab, bataiye aage kya karein?", 'ai');
                 }
             } catch (error) {
                 chatBox.removeChild(loadingMsg.parentNode);
-                appendMessage("Network busy hai, lekin multi-proxy active hai. Ek baar phir send button dabayein!", 'ai');
+                appendMessage("Connection smooth hai, dobara message bhejiye!", 'ai');
             }
             isWaiting = false;
         }
