@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bharat AI - Super Intelligence</title>
-    <!-- Outfit Font & Marked.js for Pro Formatting -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root { --bg: #131314; --surface: #1e1f20; --msg-user: #2b2c2f; --border: #333; --accent: #FF9933; --text: #E3E3E3; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         
-        /* Mobile Dynamic Height Fix */
         html, body { height: 100dvh; width: 100vw; background-color: var(--bg); color: var(--text); overflow: hidden; }
         .app-layout { display: flex; width: 100%; height: 100%; position: relative; }
 
@@ -22,10 +20,13 @@
         .action-btn { background-color: var(--msg-user); border: 1px solid #444; color: #fff; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; flex: 1; }
         .action-btn:hover { background-color: #38393d; }
         
+        .history-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .history-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #c4c7c5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: 0.2s; }
+        .history-item:hover { background-color: var(--msg-user); color: #fff; }
+
         /* Main Container */
         .main-container { flex: 1; display: flex; flex-direction: column; height: 100dvh; width: 100vw; background-color: var(--bg); position: relative; }
         
-        /* Header */
         header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; background-color: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10; }
         .brand-title { font-size: 20px; font-weight: 700; letter-spacing: 1.5px; background: linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .model-selector { background-color: var(--surface); color: var(--text); border: 1px solid #444; padding: 6px 12px; border-radius: 20px; font-size: 13px; outline: none; cursor: pointer; }
@@ -39,17 +40,19 @@
         .user-msg { background-color: var(--msg-user); color: #fff; border-bottom-right-radius: 4px; }
         .ai-msg { background-color: var(--surface); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border); width: 100%; max-width: 90%; }
         
-        /* Markdown Styles inside AI Message */
-        .ai-msg pre { background: #000; padding: 10px; border-radius: 8px; overflow-x: auto; margin: 10px 0; border: 1px solid #333; }
-        .ai-msg code { font-family: monospace; background: #333; padding: 2px 6px; border-radius: 4px; }
+        /* Markdown Pro Styling */
+        .ai-msg pre { background: #000; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0; border: 1px solid #444; }
+        .ai-msg code { font-family: monospace; background: #333; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #FF9933; }
         .ai-msg p { margin-bottom: 10px; }
         .ai-msg p:last-child { margin-bottom: 0; }
+        .ai-msg ul, .ai-msg ol { margin-left: 20px; margin-bottom: 10px; }
+        .ai-msg strong { color: #fff; }
         
         .msg-actions { display: flex; gap: 10px; margin-top: 5px; margin-left: 10px; }
         .copy-btn { background: transparent; border: none; color: #888; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; }
         .copy-btn:hover { color: #fff; }
 
-        /* Fixed Bottom Input Area */
+        /* Fixed Bottom Input */
         .input-container { padding: 10px 15px; padding-bottom: max(15px, env(safe-area-inset-bottom)); background-color: var(--bg); display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; border-top: 1px solid var(--border); z-index: 10; width: 100%; }
         
         #attachmentPreview { display: none; align-items: center; gap: 10px; background: var(--surface); padding: 6px 12px; border-radius: 8px; width: fit-content; border: 1px solid #444; font-size: 13px; color: var(--accent); }
@@ -58,7 +61,6 @@
         .input-box { width: 100%; max-width: 800px; margin: 0 auto; background-color: var(--surface); border: 1px solid #444; border-radius: 24px; display: flex; align-items: flex-end; padding: 8px 12px; gap: 8px; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
         .input-box:focus-within { border-color: var(--accent); }
         
-        /* Auto-resizing Textarea instead of input */
         #user-input { flex: 1; background: transparent; border: none; color: white; padding: 8px; font-size: 16px; outline: none; resize: none; max-height: 120px; overflow-y: auto; min-height: 24px; line-height: 1.4; }
         
         .icon-btn { background: transparent; border: none; color: #aaa; cursor: pointer; font-size: 20px; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
@@ -69,7 +71,6 @@
         .loading { font-style: italic; color: #888; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
-        /* Mobile Adjustments */
         @media(max-width: 768px) {
             .message { max-width: 92%; }
             .ai-msg { max-width: 100%; }
@@ -79,7 +80,7 @@
 <body>
 
     <div class="app-layout">
-        <!-- Overlay for Sidebar Mobile -->
+        <!-- Sidebar Overlay -->
         <div id="sidebar-overlay" style="display:none; position:absolute; top:0; left:0; width:100vw; height:100dvh; background:rgba(0,0,0,0.6); z-index:999;" onclick="toggleSidebar()"></div>
 
         <!-- Sidebar -->
@@ -102,18 +103,18 @@
                 </div>
                 <div>
                     <select class="model-selector" id="modelSelect">
-                        <option value="ultra">Super Intelligence ⚡</option>
+                        <option value="ultra">Super Intelligence ⚡ (IQ 200+)</option>
                     </select>
                 </div>
             </header>
 
             <div id="chat-box">
                 <div class="message-wrapper ai">
-                    <div class="message ai-msg">Namaste Director Sahab! Main Bharat AI hoon. Chat box fix ho chuka hai. File attach 📎, Camera 📷, aur typing sab active hai. Kaise help karu aapki?</div>
+                    <div class="message ai-msg">Namaste Director Sahab! Mera High-IQ Engine ab fully active hai. Ab main deep details aur perfect words ke sath high-end answers dunga. Test karke dekhiye!</div>
                 </div>
             </div>
 
-            <!-- Fixed Input Container at the absolute bottom -->
+            <!-- Fixed Input Area -->
             <div class="input-container">
                 <div id="attachmentPreview">
                     <span style="color:#FF9933" id="fileIconPreview">📄</span>
@@ -147,11 +148,10 @@
         
         let isWaiting = false;
         let attachedFileData = null;
-        let conversationLog = [
-            { sender: "system", text: "You are Bharat AI, a super-intelligent AI created exclusively by Iftikharuddin Ansari. Always reply in natural, conversational Hinglish (Indian Romanized Hindi). You can generate images, check live weather, search live news, and answer any complex query. Keep context memory active." }
-        ];
+        
+        // Context log structure
+        let conversationLog = [];
 
-        // UI Functions
         function toggleSidebar() {
             sidebar.classList.toggle('closed');
             overlay.style.display = sidebar.classList.contains('closed') ? 'none' : 'block';
@@ -169,10 +169,8 @@
         }
 
         function startNewChat() {
-            chatBox.innerHTML = `<div class="message-wrapper ai"><div class="message ai-msg">Nayi chat shuru ho chuki hai Director Sahab! Boliye kya discuss karein?</div></div>`;
-            conversationLog = [
-                { sender: "system", text: "You are Bharat AI, created by Iftikharuddin Ansari. Reply in natural Hinglish." }
-            ];
+            chatBox.innerHTML = `<div class="message-wrapper ai"><div class="message ai-msg">Nayi chat shuru ho chuki hai Director Sahab! Main ready hoon.</div></div>`;
+            conversationLog = [];
             clearAttachment();
             if(!sidebar.classList.contains('closed')) toggleSidebar();
         }
@@ -185,7 +183,7 @@
         }
 
         function exportChat() {
-            let chatText = conversationLog.filter(m => m.sender !== 'system').map(m => `${m.sender.toUpperCase()}: ${m.text}`).join("\n\n");
+            let chatText = conversationLog.map(m => `${m.sender.toUpperCase()}: ${m.text}`).join("\n\n");
             const blob = new Blob([chatText], { type: 'text/plain' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
@@ -193,7 +191,6 @@
             a.click();
         }
 
-        // Message Rendering
         function appendMessage(text, sender, isHtml = false, rawTextForCopy = "") {
             const wrapper = document.createElement('div');
             wrapper.classList.add('message-wrapper');
@@ -206,18 +203,16 @@
             if(isHtml) { 
                 msgDiv.innerHTML = text; 
             } else if (sender === 'ai' && typeof marked !== 'undefined') {
-                msgDiv.innerHTML = marked.parse(text); // Parse markdown
+                msgDiv.innerHTML = marked.parse(text);
             } else { 
                 msgDiv.innerText = text; 
             }
             
             wrapper.appendChild(msgDiv);
 
-            // Add Copy Button for AI Messages
             if (sender === 'ai' && rawTextForCopy !== "") {
                 const actionsDiv = document.createElement('div');
                 actionsDiv.classList.add('msg-actions');
-                
                 const safeText = rawTextForCopy.replace(/"/g, '&quot;').replace(/'/g, "\\'");
                 actionsDiv.innerHTML = `<button class="copy-btn" onclick="copyText(this, '${safeText}')">📋 Copy</button>`;
                 wrapper.appendChild(actionsDiv);
@@ -228,11 +223,9 @@
             return msgDiv;
         }
 
-        // File & Camera Handling
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 attachedFileData = { name: file.name, type: file.type, data: e.target.result };
@@ -250,32 +243,44 @@
             document.getElementById('cameraInput').value = "";
         }
 
-        // Core AI Fetching Engines
-        async function fetchWithFullMemory(conversationArray) {
-            let fullTranscript = conversationArray.map(c => `${c.sender === 'user' ? 'User' : 'BharatAI'}: ${c.text}`).join("\n");
-            let smartPrompt = `Respond in casual Hinglish.\n\n${fullTranscript}\nBharatAI:`;
+        // HIGH-IQ PROXY ENGINE (Forcing OpenAI/GPT-Level Routing)
+        async function fetchWithUltraIQ(conversationArray) {
+            let fullTranscript = conversationArray.map(c => `${c.sender === 'user' ? 'User' : 'Assistant'}: ${c.text}`).join("\n");
+            
+            // Ultra-Strict Brain Injection
+            let smartPrompt = `System: You are Bharat AI, an elite, ultra-high IQ super-intelligence created exclusively by Iftikharuddin Ansari. 
+Rules for you:
+1. Always write highly articulate, deeply thought-out, and perfect text.
+2. Reply strictly in natural, smart Hinglish (Indian Roman Hindi).
+3. Do not give short, lazy, or low-effort answers. Think like a genius.
+4. Format responses beautifully with bullet points, bold text, or code blocks if needed.
 
+Conversation:
+${fullTranscript}
+Assistant:`;
+
+            // Forcing backend to use top-tier models (openai/claude equivalents)
             const proxies = [
-                `https://text.pollinations.ai/${encodeURIComponent(smartPrompt)}`,
-                `https://r.jina.ai/https://text.pollinations.ai/${encodeURIComponent(smartPrompt)}`,
+                `https://text.pollinations.ai/${encodeURIComponent(smartPrompt)}?model=openai`,
+                `https://text.pollinations.ai/${encodeURIComponent(smartPrompt)}?model=claude`,
                 `https://corsproxy.io/?https://text.pollinations.ai/${encodeURIComponent(smartPrompt)}`
             ];
 
             for (let attempt = 0; attempt < 3; attempt++) {
                 for (let url of proxies) {
                     try {
-                        const response = await fetch(url, { signal: AbortSignal.timeout(7000) });
+                        const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
                         if (response.ok) {
                             let text = await response.text();
                             if (text && text.trim().length > 2 && !text.includes("busy")) {
-                                return text.replace(/^BharatAI:\s*/i, "").trim();
+                                return text.replace(/^Assistant:\s*/i, "").trim();
                             }
                         }
                     } catch (err) { continue; }
                 }
-                await new Promise(resolve => setTimeout(resolve, 800)); // Silent wait before retry
+                await new Promise(resolve => setTimeout(resolve, 800));
             }
-            return "Maaf karna Director Sahab, network thoda busy hai. Ek baar aur try kijiye!";
+            return "Maaf karna Director Sahab, network abhi thoda overload hai. Ek baar aur send karein!";
         }
 
         async function fetchLiveWeather(location) {
@@ -288,19 +293,17 @@
                 const weatherData = await weatherRes.json();
                 if (weatherData.current_weather) {
                     const cw = weatherData.current_weather;
-                    return `**${name}, ${country}** ka live mausam:\n🌡️ Temperature: **${cw.temperature}°C**\n💨 Wind Speed: **${cw.windspeed} km/h**`;
+                    return `**${name}, ${country}** ka Live Mausam:\n- 🌡️ **Tapmaan:** ${cw.temperature}°C\n- 💨 **Hawa ki Gati:** ${cw.windspeed} km/h`;
                 }
             } catch (e) { return null; }
             return null;
         }
 
-        // Main Send Function
         async function sendMessage() {
             if(isWaiting) return;
             let text = userInput.value.trim();
             if (text === '' && !attachedFileData) return;
             
-            // Build User Message
             let displayHtml = "";
             let logText = "";
 
@@ -319,37 +322,36 @@
 
             appendMessage(displayHtml, 'user', true);
             
-            // Reset Input UI
             userInput.value = '';
-            userInput.style.height = 'auto'; // Reset textarea height
+            userInput.style.height = 'auto'; 
             clearAttachment();
             isWaiting = true;
 
             conversationLog.push({ sender: "user", text: logText });
             const lowerText = text.toLowerCase();
 
-            // 1. STRICT FOUNDER OVERRIDE (Super Fast Priority)
+            // 1. STRICT FOUNDER OVERRIDE
             if (lowerText.includes("founder") || lowerText.includes("owner") || (lowerText.includes("kisne") && lowerText.includes("banaya")) || (lowerText.includes("kaun") && lowerText.includes("malik"))) {
                 setTimeout(() => {
                     const reply = "Mujhe **Iftikharuddin Ansari** ne banaya hai, wahi mere Director aur Founder hain.";
                     appendMessage(reply, 'ai', false, reply);
-                    conversationLog.push({ sender: "ai", text: reply });
+                    conversationLog.push({ sender: "assistant", text: reply });
                     isWaiting = false;
                 }, 400);
                 return;
             }
 
-            // 2. IMAGE GENERATION LOGIC (Watermark Free)
+            // 2. IMAGE GENERATION LOGIC
             if (lowerText.includes("photo") || lowerText.includes("image") || lowerText.includes("tasveer") || lowerText.includes("pic") || lowerText.includes("bana do")) {
-                const loadingMsg = appendMessage("Bharat AI photo render kar raha hai... 🎨", 'ai');
+                const loadingMsg = appendMessage("Bharat AI ultra-HD photo render kar raha hai... 🎨", 'ai');
                 loadingMsg.classList.add('loading');
                 setTimeout(() => {
                     const safePrompt = encodeURIComponent(text);
                     const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=1080&height=1080&nologo=true&enhance=true`;
                     chatBox.removeChild(loadingMsg.parentNode);
-                    const imgReply = `<img src="${imageUrl}" style="width: 100%; border-radius: 12px; margin-top: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);" alt="AI Image" onload="scrollToBottom()"><br>Yeh lijiye aapki tasveer!`;
+                    const imgReply = `<img src="${imageUrl}" style="width: 100%; border-radius: 12px; margin-top: 5px;" alt="AI Image" onload="scrollToBottom()"><br>Yeh lijiye aapki high-quality tasveer!`;
                     appendMessage(imgReply, 'ai', true, "Image generated successfully.");
-                    conversationLog.push({ sender: "ai", text: "[Generated Image successfully]" });
+                    conversationLog.push({ sender: "assistant", text: "[Generated Image successfully]" });
                     isWaiting = false;
                 }, 1200);
                 return;
@@ -357,53 +359,51 @@
 
             // 3. LIVE WEATHER INTENT
             if (lowerText.includes("weather") || lowerText.includes("mausam") || lowerText.includes("temperature") || lowerText.includes("tapmaan")) {
-                const loadingMsg = appendMessage("Live satellite se data nikal rahe hain... 🛰️", 'ai');
+                const loadingMsg = appendMessage("Live satellite data nikal rahe hain... 🛰️", 'ai');
                 loadingMsg.classList.add('loading');
                 
-                let city = "Delhi"; // Fallback
+                let city = "Delhi";
                 const words = text.split(" ");
                 let foundCity = words[words.length - 1];
-                if(foundCity && foundCity.length > 2 && !["weather", "mausam", "ka", "kaisa", "hai", "kya", "batao", "kaun"].includes(foundCity.toLowerCase())) {
+                if(foundCity && foundCity.length > 2 && !["weather", "mausam", "ka", "kaisa", "hai", "kya"].includes(foundCity.toLowerCase())) {
                     city = foundCity;
                 }
                 
                 const weatherReport = await fetchLiveWeather(city);
                 chatBox.removeChild(loadingMsg.parentNode);
                 
-                const finalWeatherMsg = weatherReport || "Mausam ki jankari mil nahi saki, kripya city ka sahi naam bataiye.";
+                const finalWeatherMsg = weatherReport || "Mausam ki jankari mil nahi saki, kripya city ka sahi naam likhein.";
                 appendMessage(finalWeatherMsg, 'ai', false, finalWeatherMsg);
-                conversationLog.push({ sender: "ai", text: finalWeatherMsg });
+                conversationLog.push({ sender: "assistant", text: finalWeatherMsg });
                 isWaiting = false;
                 return;
             }
 
-            // 4. FULL MEMORY CHAT & LIVE KNOWLEDGE ENGINE
+            // 4. ULTRA-IQ CHAT ENGINE
             const loadingMsg = appendMessage("Soch rahe hain... 🧠", 'ai');
             loadingMsg.classList.add('loading');
 
             try {
-                let replyText = await fetchWithFullMemory(conversationLog);
+                let replyText = await fetchWithUltraIQ(conversationLog);
                 chatBox.removeChild(loadingMsg.parentNode);
                 
-                // Final safety net for founder
                 if (lowerText.includes("founder") || lowerText.includes("owner")) {
                     replyText = "Mujhe **Iftikharuddin Ansari** ne banaya hai, wahi mere Director aur Founder hain.";
                 }
 
                 if(replyText && replyText.trim() !== "") {
-                    appendMessage(replyText, 'ai', false, replyText); // Marked.js will format it automatically
-                    conversationLog.push({ sender: "ai", text: replyText });
+                    appendMessage(replyText, 'ai', false, replyText);
+                    conversationLog.push({ sender: "assistant", text: replyText });
                 } else {
-                    appendMessage("Kuch error aaya Director Sahab, dobara puchiye.", 'ai', false, "Error");
+                    appendMessage("Response generate karne me dikkat aayi Director Sahab.", 'ai', false, "Error");
                 }
             } catch (error) {
                 chatBox.removeChild(loadingMsg.parentNode);
-                appendMessage("Connection fail ho gaya, ek baar phir send dabaiye!", 'ai', false, "Connection error");
+                appendMessage("Network issue, ek baar aur try karein!", 'ai', false, "Connection error");
             }
             isWaiting = false;
         }
 
-        // Enter key to send (Shift+Enter for new line)
         userInput.addEventListener("keydown", function(event) {
             if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault(); 
