@@ -57,8 +57,8 @@
     </div>
 
     <script>
-        // Aapki Gemini API Key (Pro Version)
-        const API_KEY = 'AQ.Ab8RN6IZ97zgh-EKGIinXuiZ9xUmrOUvV_NO0xqA7SsS68ltcg'; 
+        // Aapki Nayi Verified API Key aur Flash Model
+        const API_KEY = 'AQ.Ab8RN6K_ZsPpsHmObKS4gTjUlSvhrxG905PPLGTwdHwXbPdPA'; 
 
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
@@ -70,7 +70,6 @@
             msgDiv.classList.add(sender === 'user' ? 'user-msg' : 'ai-msg');
             
             if(isHtml) { 
-                // Format basic Markdown to HTML
                 let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
                                         .replace(/\*(.*?)\*/g, '<i>$1</i>')
                                         .replace(/\n/g, '<br>');
@@ -109,7 +108,7 @@
                 return;
             }
 
-            // 2. TEXT GENERATION LOGIC (GEMINI PRO)
+            // 2. TEXT GENERATION LOGIC (GEMINI FLASH - FAST & UNLIMITED)
             const loadingMsg = appendMessage("Bharat AI soch raha hai...", 'ai');
             loadingMsg.classList.add('loading');
 
@@ -128,7 +127,7 @@
                 if(data.candidates && data.candidates[0].content.parts[0].text) {
                     appendMessage(data.candidates[0].content.parts[0].text, 'ai', true);
                 } else {
-                    appendMessage("Server par load zyada hai, kripya dobara koshish karein.", 'ai');
+                    appendMessage("Response generate karne me kuch dikkat aayi, dobara try karein.", 'ai');
                 }
             } catch (error) {
                 chatBox.removeChild(loadingMsg);
@@ -137,12 +136,10 @@
             isWaiting = false;
         }
 
-        // Enter key to send message
         userInput.addEventListener("keypress", function(event) {
             if (event.key === "Enter") { event.preventDefault(); sendMessage(); }
         });
 
-        // VOICE COMMAND LOGIC (WEB SPEECH API)
         function startVoiceRecognition() {
             const micBtn = document.getElementById('micBtn');
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -153,11 +150,11 @@
             }
 
             const recognition = new SpeechRecognition();
-            recognition.lang = 'hi-IN'; // Indian context and Hindi support
+            recognition.lang = 'hi-IN';
             recognition.interimResults = false;
 
             recognition.onstart = function() {
-                micBtn.style.backgroundColor = '#FF9933'; // Mic turns saffron when listening
+                micBtn.style.backgroundColor = '#FF9933';
                 micBtn.style.color = 'white';
             };
 
